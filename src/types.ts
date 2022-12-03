@@ -9,6 +9,12 @@ export class AddressBook {
     this.people.push(new Person());
     this.selectedPerson = this.people[this.people.length - 1];
   }
+  removeContact(person: Person) {
+    const index = this.people.indexOf(person);
+    if (index > -1) {
+      this.people.splice(index, 1);
+    }
+  }
 }
 export class Person {
   name: string;

@@ -35,8 +35,8 @@ export default function Home() {
           <thead>
             <tr>
               <th>Name</th>
-              <th>Phone</th>
               <th>Email</th>
+              <th>Phone</th>
             </tr>
           </thead>
           <tbody>
@@ -53,8 +53,8 @@ export default function Home() {
                   }}
                 >
                   <td>{person.name}</td>
-                  <td>{person.phone}</td>
                   <td>{person.email}</td>
+                  <td>{person.phone}</td>
                 </tr>
               );
             })}
@@ -77,6 +77,49 @@ export default function Home() {
                 }}
               />
             </label>
+
+            <label>
+              Email
+              <input
+                type="email"
+                value={addressBook.selectedPerson.email}
+                onChange={(event) => {
+                  setAddressBook((addressBook) => {
+                    addressBook = cloneDeep(addressBook);
+                    addressBook.selectedPerson!.email = event.target.value;
+                    return addressBook;
+                  });
+                }}
+              />
+            </label>
+
+            <label>
+              Phone
+              <input
+                type="tel"
+                value={addressBook.selectedPerson.phone}
+                onChange={(event) => {
+                  setAddressBook((addressBook) => {
+                    addressBook = cloneDeep(addressBook);
+                    addressBook.selectedPerson!.phone = event.target.value;
+                    return addressBook;
+                  });
+                }}
+              />
+            </label>
+
+            <button
+              onClick={() => {
+                setAddressBook((addressBook) => {
+                  addressBook = cloneDeep(addressBook);
+                  addressBook.removeContact(addressBook.selectedPerson!);
+                  addressBook.selectedPerson = undefined;
+                  return addressBook;
+                });
+              }}
+            >
+              Remove
+            </button>
           </div>
         )}
       </div>
