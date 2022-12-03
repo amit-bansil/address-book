@@ -5,6 +5,10 @@ export class AddressBook {
     this.people = [];
     this.selectedPerson = undefined;
   }
+  addContact() {
+    this.people.push(new Person());
+    this.selectedPerson = this.people[this.people.length - 1];
+  }
 }
 export class Person {
   name: string;
