@@ -22,7 +22,6 @@ export default function Home() {
             setAddressBook((addressBook) => {
               addressBook = cloneDeep(addressBook);
               addressBook.addContact();
-              console.log(addressBook.selectedPerson);
               return addressBook;
             })
           }
