@@ -127,7 +127,7 @@ export const Modal = React.memo(function Modal({
         </Transition.Child>
 
         <div className="fixed inset-0 z-10 overflow-y-auto">
-          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+          <div className="flex items-center justify-center p-4 text-center">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -221,5 +221,30 @@ export const TableHeader = React.memo(function TableHeader({
     >
       {children}
     </th>
+  );
+});
+
+interface LinkButtonProps {
+  children: React.ReactNode;
+  onClick: () => void;
+  className?: string;
+  style?: "primary" | "danger";
+}
+export const LinkButton = React.memo(function LinkButton({
+  children,
+  onClick,
+  className,
+  style = "primary",
+}: LinkButtonProps) {
+  return (
+    <button
+      className={classNames(
+        style === "primary" ? "text-indigo-600" : "text-red-600",
+        className
+      )}
+      onClick={onClick}
+    >
+      {children}
+    </button>
   );
 });

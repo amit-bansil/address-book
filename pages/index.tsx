@@ -3,6 +3,7 @@ import { AddressBook, Person } from "../src/types";
 import cloneDeep from "lodash/cloneDeep";
 import {
   FormGroup,
+  LinkButton,
   Modal,
   Page,
   PlaceholderPanel,
@@ -78,6 +79,14 @@ function SelectedPersonModal({ addressBook, setAddressBook }: ContentProps) {
     });
     close();
   }
+  function remove() {
+    setAddressBook((addressBook) => {
+      addressBook = cloneDeep(addressBook);
+      addressBook.removeContact(addressBook.selectedPerson!);
+      return addressBook;
+    });
+    close();
+  }
   if (!addressBook.selectedPerson) return null;
   return (
     <Modal onClose={() => {}}>
@@ -127,11 +136,15 @@ function SelectedPersonModal({ addressBook, setAddressBook }: ContentProps) {
             />
           )}
         </FormGroup>
-        <div className="flex gap-4">
+        <div className="flex gap-4 items-baseline">
           <PushButton onClick={save}>Save</PushButton>
           <PushButton style="tertiary" onClick={close}>
             Cancel
           </PushButton>
+          <div className="grow" />
+          <LinkButton style="danger" onClick={remove}>
+            Delete
+          </LinkButton>
         </div>
       </div>
     </Modal>
@@ -139,8 +152,8 @@ function SelectedPersonModal({ addressBook, setAddressBook }: ContentProps) {
 }
 const Content = ({ addressBook, setAddressBook }: ContentProps) => {
   return (
-    <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
-      <div className="inline-block min-w-full align-middle md:px-6 lg:px-8">
+    <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6">
+      <div className="inline-block min-w-full align-middle">
         <table className="table-fixed width-full min-w-full divide-y divide-gray-300">
           <thead>
             <tr>
@@ -195,22 +208,6 @@ const Content = ({ addressBook, setAddressBook }: ContentProps) => {
           </tbody>
         </table>
       </div>
-      {addressBook.selectedPerson && (
-        <div>
-          <button
-            onClick={() => {
-              setAddressBook((addressBook) => {
-                addressBook = cloneDeep(addressBook);
-                addressBook.removeContact(addressBook.selectedPerson!);
-                addressBook.selectedPerson = undefined;
-                return addressBook;
-              });
-            }}
-          >
-            Remove
-          </button>
-        </div>
-      )}
     </div>
   );
 };
@@ -231,12 +228,12 @@ function InputCell({
   setAddressBook,
 }: InputCellProps) {
   return (
-    <td className="overflow-hidden text-ellipsis whitespace-nowrap py-2 px-1 text-sm text-gray-500 first:pl-4">
+    <td className="overflow-hidden text-ellipsis whitespace-nowrap py-2 px-3 text-sm text-gray-500">
       <input
         type={type}
         aria-label={ariaLabel}
         value={person[field]}
-        className="px-2 py-2 w-full border-none"
+        className="py-1 w-full border-none"
         onChange={(event) => {
           setAddressBook((addressBook: AddressBook) => {
             addressBook = cloneDeep(addressBook);
