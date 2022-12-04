@@ -56,6 +56,8 @@ function SelectedPersonModal({ addressBook, setAddressBook }: ContentProps) {
   const nameRef = useRef<HTMLInputElement>();
   const emailRef = useRef<HTMLInputElement>();
   const phoneRef = useRef<HTMLInputElement>();
+  const addressRef = useRef<HTMLInputElement>();
+  const notesRef = useRef<HTMLInputElement>();
 
   function close() {
     setAddressBook((addressBook) => {
@@ -70,6 +72,8 @@ function SelectedPersonModal({ addressBook, setAddressBook }: ContentProps) {
       addressBook.selectedPerson!.name = nameRef.current!.value;
       addressBook.selectedPerson!.email = emailRef.current!.value;
       addressBook.selectedPerson!.phone = phoneRef.current!.value;
+      addressBook.selectedPerson!.address = addressRef.current!.value;
+      addressBook.selectedPerson!.notes = notesRef.current!.value;
       return addressBook;
     });
     close();
@@ -102,6 +106,24 @@ function SelectedPersonModal({ addressBook, setAddressBook }: ContentProps) {
               {...props}
               type="tel"
               defaultValue={addressBook.selectedPerson!.phone}
+            />
+          )}
+        </FormGroup>
+        <FormGroup label="Address" id="address" ref={addressRef}>
+          {(props) => (
+            <textarea
+              rows={4}
+              {...props}
+              defaultValue={addressBook.selectedPerson!.address}
+            />
+          )}
+        </FormGroup>
+        <FormGroup label="Notes" id="notes" ref={notesRef}>
+          {(props) => (
+            <textarea
+              rows={4}
+              {...props}
+              defaultValue={addressBook.selectedPerson!.notes}
             />
           )}
         </FormGroup>
