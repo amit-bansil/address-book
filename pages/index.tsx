@@ -112,7 +112,7 @@ function SelectedPersonModal({ addressBook, setAddressBook }: ContentProps) {
         <FormGroup label="Address" id="address" ref={addressRef}>
           {(props) => (
             <textarea
-              rows={4}
+              rows={3}
               {...props}
               defaultValue={addressBook.selectedPerson!.address}
             />
@@ -121,7 +121,7 @@ function SelectedPersonModal({ addressBook, setAddressBook }: ContentProps) {
         <FormGroup label="Notes" id="notes" ref={notesRef}>
           {(props) => (
             <textarea
-              rows={4}
+              rows={3}
               {...props}
               defaultValue={addressBook.selectedPerson!.notes}
             />
