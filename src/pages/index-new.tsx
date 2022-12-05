@@ -1,5 +1,4 @@
 import { useRef, useState } from "react";
-import { AddressBook, Person } from "../src/types";
 import cloneDeep from "lodash/cloneDeep";
 import {
   FormGroup,
@@ -9,8 +8,9 @@ import {
   PlaceholderPanel,
   PushButton,
   TableHeader,
-} from "../src/components";
+} from "../components";
 import { ArrowRightCircleIcon } from "@heroicons/react/24/solid";
+import { AddressBook, Person } from "../types";
 export default function Home() {
   const [addressBook, setAddressBook] = useState(new AddressBook());
   let content;
@@ -27,7 +27,7 @@ export default function Home() {
       description="Simple tool for storing information about contacts."
     >
       <PushButton
-        className="w-full mb-5"
+        className="mb-5 w-full"
         onClick={() =>
           setAddressBook((addressBook) => {
             addressBook = cloneDeep(addressBook);
@@ -136,7 +136,7 @@ function SelectedPersonModal({ addressBook, setAddressBook }: ContentProps) {
             />
           )}
         </FormGroup>
-        <div className="flex gap-4 items-baseline">
+        <div className="flex items-baseline gap-4">
           <PushButton onClick={save}>Save</PushButton>
           <PushButton style="tertiary" onClick={close}>
             Cancel
@@ -154,7 +154,7 @@ const Content = ({ addressBook, setAddressBook }: ContentProps) => {
   return (
     <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6">
       <div className="inline-block min-w-full align-middle">
-        <table className="table-fixed width-full min-w-full divide-y divide-gray-300">
+        <table className="width-full min-w-full table-fixed divide-y divide-gray-300">
           <thead>
             <tr>
               <TableHeader className="w-[30%] pl-6">Name</TableHeader>
@@ -233,11 +233,11 @@ function InputCell({
         type={type}
         aria-label={ariaLabel}
         value={person[field]}
-        className="py-1 w-full border-none"
+        className="w-full border-none py-1"
         onChange={(event) => {
           setAddressBook((addressBook: AddressBook) => {
             addressBook = cloneDeep(addressBook);
-            addressBook.people[index][field] = event.target.value;
+            addressBook.people[index]![field] = event.target.value;
             return addressBook;
           });
         }}

@@ -33,7 +33,7 @@ export const Page = React.memo(function Page({
                   <div className="border-b border-gray-700">
                     <div className="flex h-12 items-center justify-between px-4 sm:px-0">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0 text-white font-extrabold">
+                        <div className="flex-shrink-0 font-extrabold text-white">
                           {title}
                         </div>
                       </div>
@@ -41,7 +41,7 @@ export const Page = React.memo(function Page({
                         {/* Profile dropdown */}
                         <Menu as="div" className="relative ml-3">
                           <div>
-                            <Menu.Button className="flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 text-white">
+                            <Menu.Button className="flex max-w-xs items-center rounded-full bg-gray-800 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                               <span className="sr-only">Open user menu</span>
                               amit@bansil.org
                             </Menu.Button>
@@ -192,10 +192,10 @@ export const PushButton = React.memo(function PushButton({
       type="button"
       onClick={onClick}
       className={classNames(
-        "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2",
+        "inline-flex justify-center rounded-md border   px-4 py-2 text-sm font-medium text-white  hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2",
         style === "tertiary"
           ? "border-gray-300 bg-white text-base  text-gray-700 hover:bg-gray-50"
-          : "",
+          : "border-transparent bg-indigo-600 shadow-sm",
         className
       )}
     >
@@ -215,7 +215,7 @@ export const TableHeader = React.memo(function TableHeader({
     <th
       scope="col"
       className={classNames(
-        "pb-1.5 px-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500",
+        "px-3 pb-1.5 text-left text-xs font-medium uppercase tracking-wide text-gray-500",
         className
       )}
     >

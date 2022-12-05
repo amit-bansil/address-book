@@ -1,3 +1,5 @@
+import { Person } from "./Person";
+
 export class AddressBook {
   selectedPerson?: Person; // reference to object in People
   people: Person[];
@@ -14,19 +16,5 @@ export class AddressBook {
     if (index > -1) {
       this.people.splice(index, 1);
     }
-  }
-}
-export class Person {
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  notes: string;
-  constructor() {
-    this.name = "";
-    this.email = "";
-    this.phone = "";
-    this.address = "";
-    this.notes = "";
   }
 }
