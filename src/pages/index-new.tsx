@@ -39,6 +39,7 @@ export default function Home() {
         Add Contact
       </PushButton>
       {content}
+      {/* Use a modal instead of a route so that we don't lose scroll position */}
       <SelectedPersonModal
         addressBook={addressBook}
         setAddressBook={setAddressBook}
