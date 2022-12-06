@@ -21,21 +21,19 @@ export default function Home() {
       <Content addressBook={addressBook} setAddressBook={setAddressBook} />
     );
   }
+  function addContact() {
+    setAddressBook((addressBook) => {
+      addressBook = cloneDeep(addressBook);
+      addressBook.addContact();
+      return addressBook;
+    });
+  }
   return (
     <Page
       title="Address Book"
       description="Simple tool for storing information about contacts."
     >
-      <PushButton
-        className="mb-5 w-full"
-        onClick={() =>
-          setAddressBook((addressBook) => {
-            addressBook = cloneDeep(addressBook);
-            addressBook.addContact();
-            return addressBook;
-          })
-        }
-      >
+      <PushButton className="mb-5 w-full" onClick={addContact}>
         Add Contact
       </PushButton>
       {content}
