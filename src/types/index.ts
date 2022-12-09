@@ -1,2 +1,2 @@
-export { AddressBook } from "./AddressBook";
-export { Person } from "./Person";
+export type { AddressBook } from "./AddressBook";
+export type { Person } from "./Person";

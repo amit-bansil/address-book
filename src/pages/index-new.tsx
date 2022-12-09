@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import cloneDeep from "lodash/cloneDeep";
 import {
   FormGroup,
@@ -11,92 +11,76 @@ import {
 } from "../components";
 import { ArrowRightCircleIcon } from "@heroicons/react/24/solid";
 import { AddressBook, Person } from "../types";
+import { useStore } from "../store";
+import shallow from "zustand/shallow";
+
 export default function Home() {
-  const [addressBook, setAddressBook] = useState(new AddressBook());
+  const { addPerson, hasPeople } = useStore(
+    (store) => ({
+      addPerson: store.addPerson,
+      hasPeople: store.people.length > 0,
+    }),
+    shallow
+  );
   let content;
-  if (addressBook.people.length === 0) {
+  if (!hasPeople) {
     content = <PlaceholderPanel />;
   } else {
-    content = (
-      <Content addressBook={addressBook} setAddressBook={setAddressBook} />
-    );
-  }
-  function addContact() {
-    setAddressBook((addressBook) => {
-      addressBook = cloneDeep(addressBook);
-      addressBook.addContact();
-      return addressBook;
-    });
+    content = <Content />;
   }
   return (
     <Page
       title="Address Book"
-      description="Simple tool for storing information about contacts."
+      description="Simple tool for storing information about persons."
     >
-      <PushButton className="mb-5 w-full" onClick={addContact}>
-        Add Contact
+      <PushButton className="mb-5 w-full" onClick={addPerson}>
+        Add Person
       </PushButton>
       {content}
       {/* Use a modal instead of a route so that we don't lose scroll position */}
-      <SelectedPersonModal
-        addressBook={addressBook}
-        setAddressBook={setAddressBook}
-      />
+      <SelectedPersonModal />
     </Page>
   );
 }
-type SetAddressBook = (
-  reducer: (addressBook: AddressBook) => AddressBook
-) => void;
-interface ContentProps {
-  addressBook: AddressBook;
-  setAddressBook: SetAddressBook;
-}
-function SelectedPersonModal({ addressBook, setAddressBook }: ContentProps) {
+function SelectedPersonModal() {
+  const { selectedPerson, savePerson, removePerson, selectNobody } = useStore(
+    (store) => ({
+      selectedPerson: store.people.find((p) => p.id === store.selectedPersonId),
+      savePerson: store.savePerson,
+      removePerson: store.removePerson,
+      selectNobody: () => store.selectPerson(null),
+    }),
+    shallow
+  );
   const nameRef = useRef<HTMLInputElement>();
   const emailRef = useRef<HTMLInputElement>();
   const phoneRef = useRef<HTMLInputElement>();
   const addressRef = useRef<HTMLInputElement>();
   const notesRef = useRef<HTMLInputElement>();
 
-  function close() {
-    setAddressBook((addressBook) => {
-      addressBook = cloneDeep(addressBook);
-      addressBook.selectedPerson = undefined;
-      return addressBook;
-    });
-  }
+  if (!selectedPerson) return null;
   function save() {
-    setAddressBook((addressBook) => {
-      addressBook = cloneDeep(addressBook);
-      addressBook.selectedPerson!.name = nameRef.current!.value;
-      addressBook.selectedPerson!.email = emailRef.current!.value;
-      addressBook.selectedPerson!.phone = phoneRef.current!.value;
-      addressBook.selectedPerson!.address = addressRef.current!.value;
-      addressBook.selectedPerson!.notes = notesRef.current!.value;
-      return addressBook;
+    savePerson({
+      id: selectedPerson!.id,
+      name: nameRef.current!.value,
+      email: emailRef.current!.value,
+      phone: phoneRef.current!.value,
+      address: addressRef.current!.value,
+      notes: notesRef.current!.value,
     });
-    close();
   }
   function remove() {
-    setAddressBook((addressBook) => {
-      addressBook = cloneDeep(addressBook);
-      addressBook.removeContact(addressBook.selectedPerson!);
-      return addressBook;
-    });
-    close();
+    removePerson(selectedPerson!.id);
   }
-  if (!addressBook.selectedPerson) return null;
+  function close() {
+    selectNobody();
+  }
   return (
     <Modal onClose={() => {}}>
       <div className="flex flex-col gap-8">
         <FormGroup label="Name" id="name" ref={nameRef}>
           {(props) => (
-            <input
-              {...props}
-              type="text"
-              defaultValue={addressBook.selectedPerson!.name}
-            />
+            <input {...props} type="text" defaultValue={selectedPerson!.name} />
           )}
         </FormGroup>
         <FormGroup label="Email" id="email" ref={emailRef}>
@@ -104,17 +88,13 @@ function SelectedPersonModal({ addressBook, setAddressBook }: ContentProps) {
             <input
               {...props}
               type="email"
-              defaultValue={addressBook.selectedPerson!.email}
+              defaultValue={selectedPerson.email}
             />
           )}
         </FormGroup>
         <FormGroup label="Phone" id="phone" ref={phoneRef}>
           {(props) => (
-            <input
-              {...props}
-              type="tel"
-              defaultValue={addressBook.selectedPerson!.phone}
-            />
+            <input {...props} type="tel" defaultValue={selectedPerson.phone} />
           )}
         </FormGroup>
         <FormGroup label="Address" id="address" ref={addressRef}>
@@ -122,17 +102,13 @@ function SelectedPersonModal({ addressBook, setAddressBook }: ContentProps) {
             <textarea
               rows={3}
               {...props}
-              defaultValue={addressBook.selectedPerson!.address}
+              defaultValue={selectedPerson.address}
             />
           )}
         </FormGroup>
         <FormGroup label="Notes" id="notes" ref={notesRef}>
           {(props) => (
-            <textarea
-              rows={3}
-              {...props}
-              defaultValue={addressBook.selectedPerson!.notes}
-            />
+            <textarea rows={3} {...props} defaultValue={selectedPerson.notes} />
           )}
         </FormGroup>
         <div className="flex items-baseline gap-4">
@@ -149,7 +125,8 @@ function SelectedPersonModal({ addressBook, setAddressBook }: ContentProps) {
     </Modal>
   );
 }
-const Content = ({ addressBook, setAddressBook }: ContentProps) => {
+const Content = () => {
+  const people = useStore((store) => store.people, shallow);
   return (
     <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6">
       <div className="inline-block min-w-full align-middle">
@@ -162,47 +139,8 @@ const Content = ({ addressBook, setAddressBook }: ContentProps) => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {addressBook.people.map((person, index) => (
-              <tr key={index}>
-                <InputCell
-                  type="text"
-                  ariaLabel="Name"
-                  field="name"
-                  person={person}
-                  index={index}
-                  setAddressBook={setAddressBook}
-                />
-
-                <InputCell
-                  type="email"
-                  ariaLabel="Email Address"
-                  field="email"
-                  person={person}
-                  index={index}
-                  setAddressBook={setAddressBook}
-                />
-
-                <InputCell
-                  type="tel"
-                  ariaLabel="Phone Number"
-                  field="phone"
-                  person={person}
-                  index={index}
-                  setAddressBook={setAddressBook}
-                />
-                <td
-                  className="cursor-pointer  text-indigo-600 hover:text-indigo-900 active:text-indigo-400"
-                  onClick={() => {
-                    setAddressBook((addressBook) => {
-                      addressBook = cloneDeep(addressBook);
-                      addressBook.selectedPerson = addressBook.people[index];
-                      return addressBook;
-                    });
-                  }}
-                >
-                  <ArrowRightCircleIcon className="w-6" />
-                </td>
-              </tr>
+            {people.map((person) => (
+              <PersonRow key={person.id} person={person} />
             ))}
           </tbody>
         </table>
@@ -210,36 +148,57 @@ const Content = ({ addressBook, setAddressBook }: ContentProps) => {
     </div>
   );
 };
+function PersonRow({ person }: { person: Person }) {
+  const { selectPerson } = useStore((store) => ({
+    selectPerson: store.selectPerson,
+  }));
+  return (
+    <tr>
+      <InputCell type="text" ariaLabel="Name" field="name" person={person} />
+
+      <InputCell
+        type="email"
+        ariaLabel="Email Address"
+        field="email"
+        person={person}
+      />
+
+      <InputCell
+        type="tel"
+        ariaLabel="Phone Number"
+        field="phone"
+        person={person}
+      />
+      <td
+        className="cursor-pointer  text-indigo-600 hover:text-indigo-900 active:text-indigo-400"
+        onClick={() => {
+          selectPerson(person.id);
+        }}
+      >
+        <ArrowRightCircleIcon className="w-6" />
+      </td>
+    </tr>
+  );
+}
 interface InputCellProps {
   type: string;
   ariaLabel: string;
   field: keyof Person;
   person: Person;
-  index: number;
-  setAddressBook: SetAddressBook;
 }
-function InputCell({
-  type,
-  ariaLabel,
-  field,
-  person,
-  index,
-  setAddressBook,
-}: InputCellProps) {
+function InputCell({ type, ariaLabel, field, person }: InputCellProps) {
+  const savePerson = useStore((store) => store.savePerson);
+  function saveValue(event: React.ChangeEvent<HTMLInputElement>) {
+    savePerson({ ...person, [field]: event.target.value });
+  }
   return (
-    <td className="overflow-hidden text-ellipsis whitespace-nowrap py-2 px-3 text-sm text-gray-500">
+    <td className="overflow-hidden text-ellipsis whitespace-nowrap py-2 px-3 text-sm text-gray-500 first:pl-6">
       <input
         type={type}
         aria-label={ariaLabel}
         value={person[field]}
-        className="w-full border-none py-1"
-        onChange={(event) => {
-          setAddressBook((addressBook: AddressBook) => {
-            addressBook = cloneDeep(addressBook);
-            addressBook.people[index]![field] = event.target.value;
-            return addressBook;
-          });
-        }}
+        className="w-full border-none py-1 pl-0"
+        onChange={saveValue}
       />
     </td>
   );
