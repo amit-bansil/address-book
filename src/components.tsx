@@ -2,6 +2,8 @@ import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import React from "react";
 import Head from "next/head";
+import { signIn, signOut, useSession } from "next-auth/react";
+
 interface PageProps {
   title: string;
   description: string;
@@ -16,78 +18,93 @@ export const Page = React.memo(function Page({
   description,
   children,
 }: PageProps) {
+  const { data: sessionData } = useSession();
+  const profileDropdown = (
+    <Menu as="div" className="relative ml-3">
+      <div>
+        <Menu.Button className="flex max-w-xs items-center rounded-full bg-gray-800 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+          <span className="sr-only">Open user menu</span>
+          {sessionData?.user?.email}
+        </Menu.Button>
+      </div>
+      <Transition
+        as={Fragment}
+        enter="transition ease-out duration-100"
+        enterFrom="transform opacity-0 scale-95"
+        enterTo="transform opacity-100 scale-100"
+        leave="transition ease-in duration-75"
+        leaveFrom="transform opacity-100 scale-100"
+        leaveTo="transform opacity-0 scale-95"
+      >
+        <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <Menu.Item>
+            {({ active }) => (
+              <a
+                className={classNames(
+                  active ? "bg-gray-100" : "",
+                  "block px-4 py-2 text-sm text-gray-700"
+                )}
+                onClick={() => signOut()}
+              >
+                Log Out
+              </a>
+            )}
+          </Menu.Item>
+        </Menu.Items>
+      </Transition>
+    </Menu>
+  );
+  const header = (
+    <>
+      <div className="mx-auto max-w-xl sm:px-6 lg:px-8">
+        <div className="border-b border-gray-700">
+          <div className="flex h-12 items-center justify-between px-4 sm:px-0">
+            <div className="flex items-center">
+              <div className="flex-shrink-0 font-extrabold text-white">
+                {title}
+              </div>
+            </div>
+            <div className="ml-4 flex items-center md:ml-6">
+              {profileDropdown}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+  let body = (
+    <div className="min-h-full">
+      <div className="bg-gray-800 pb-28">
+        <Disclosure as="nav" className="bg-gray-800">
+          {() => header}
+        </Disclosure>
+      </div>
+
+      <main className="-mt-28">
+        <div className="mx-auto max-w-xl px-4 pb-12 sm:px-6 lg:px-8">
+          <div className="rounded-lg bg-white px-5 py-6 shadow sm:px-6">
+            {children}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+  if (!sessionData?.user) {
+    body = (
+      <div className="flex h-screen">
+        <div className="m-auto">
+          <PushButton onClick={signIn}>Log In</PushButton>
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       <Head>
         <title>{title}</title>
         <meta name="description" content={description} />
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="stylesheet" href="https://rsms.me/inter/inter.css"></link>
       </Head>
-      <div className="min-h-full">
-        <div className="bg-gray-800 pb-28">
-          <Disclosure as="nav" className="bg-gray-800">
-            {({ open }) => (
-              <>
-                <div className="mx-auto max-w-xl sm:px-6 lg:px-8">
-                  <div className="border-b border-gray-700">
-                    <div className="flex h-12 items-center justify-between px-4 sm:px-0">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 font-extrabold text-white">
-                          {title}
-                        </div>
-                      </div>
-                      <div className="ml-4 flex items-center md:ml-6">
-                        {/* Profile dropdown */}
-                        <Menu as="div" className="relative ml-3">
-                          <div>
-                            <Menu.Button className="flex max-w-xs items-center rounded-full bg-gray-800 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                              <span className="sr-only">Open user menu</span>
-                              amit@bansil.org
-                            </Menu.Button>
-                          </div>
-                          <Transition
-                            as={Fragment}
-                            enter="transition ease-out duration-100"
-                            enterFrom="transform opacity-0 scale-95"
-                            enterTo="transform opacity-100 scale-100"
-                            leave="transition ease-in duration-75"
-                            leaveFrom="transform opacity-100 scale-100"
-                            leaveTo="transform opacity-0 scale-95"
-                          >
-                            <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                              <Menu.Item>
-                                {({ active }) => (
-                                  <a
-                                    className={classNames(
-                                      active ? "bg-gray-100" : "",
-                                      "block px-4 py-2 text-sm text-gray-700"
-                                    )}
-                                  >
-                                    Log Out
-                                  </a>
-                                )}
-                              </Menu.Item>
-                            </Menu.Items>
-                          </Transition>
-                        </Menu>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-          </Disclosure>
-        </div>
-
-        <main className="-mt-28">
-          <div className="mx-auto max-w-xl px-4 pb-12 sm:px-6 lg:px-8">
-            <div className="rounded-lg bg-white px-5 py-6 shadow sm:px-6">
-              {children}
-            </div>
-          </div>
-        </main>
-      </div>
+      {body}
     </>
   );
 });

@@ -1,3 +1,10 @@
 {
-  "cSpell.words": ["headlessui", "heroicons", "tailwindcss", "uuidv", "zustand"]
+  "cSpell.words": [
+    "headlessui",
+    "heroicons",
+    "tailwindcss",
+    "trpc",
+    "uuidv",
+    "zustand"
+  ]
 }
